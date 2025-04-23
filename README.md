@@ -6,11 +6,9 @@ An atarded version of Wordle.
 
 - Daily word challenge
 - Random word mode after completing daily challenge
-- Mario-themed design with custom font
 - Animated tiles and keyboard
 - Confetti celebration on victory
 - Share results on Twitter
-- Responsive design
 - Persistent progress tracking
 
 ## Tech Stack
