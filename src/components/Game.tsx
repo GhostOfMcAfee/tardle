@@ -47,18 +47,32 @@ export default function Game({ initialRandomMode }: GameProps) {
         // Check if we've completed today's word
         const todayKey = getTodayKey();
         const completedDaily = localStorage.getItem(`completed_daily_${todayKey}`);
+        const cachedDailyWord = localStorage.getItem(`daily_word_${todayKey}`);
         
-        // If we've completed today's word or explicitly in random mode, use practice mode
-        const mode = (completedDaily === 'true' || isRandomMode) ? 'practice' : 'daily';
-        
-        const response = await fetch(`/api/word?mode=${mode}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch word');
+        // If in random mode, always fetch a new word
+        if (isRandomMode) {
+          const response = await fetch('/api/word?mode=practice');
+          if (!response.ok) throw new Error('Failed to fetch word');
+          const data = await response.json();
+          if (data.error) throw new Error(data.error);
+          setGameState((prev: GameState) => ({ ...prev, word: data.word }));
+          return;
         }
+        
+        // If we have today's word cached and we're in daily mode, use it
+        if (cachedDailyWord && !isRandomMode) {
+          setGameState((prev: GameState) => ({ ...prev, word: cachedDailyWord as ValidWord }));
+          return;
+        }
+        
+        // Otherwise fetch the daily word and cache it
+        const response = await fetch('/api/word?mode=daily');
+        if (!response.ok) throw new Error('Failed to fetch word');
         const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
+        if (data.error) throw new Error(data.error);
+        
+        // Cache the daily word
+        localStorage.setItem(`daily_word_${todayKey}`, data.word);
         setGameState((prev: GameState) => ({ ...prev, word: data.word }));
       } catch (error) {
         console.error('Error fetching word:', error);
