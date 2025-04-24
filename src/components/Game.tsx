@@ -16,14 +16,18 @@ const getTodayKey = () => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-export default function Game() {
+interface GameProps {
+  initialRandomMode: boolean;
+}
+
+export default function Game({ initialRandomMode }: GameProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [invalidWord, setInvalidWord] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showAnswerPopup, setShowAnswerPopup] = useState(false);
   const [showVictoryModal, setShowVictoryModal] = useState(false);
-  const [isRandomMode, setIsRandomMode] = useState(false);
+  const [isRandomMode, setIsRandomMode] = useState(initialRandomMode);
   const [gameState, setGameState] = useState<GameState>({
     board: Array(MAX_ATTEMPTS).fill('').map(() => Array(WORD_LENGTH).fill('')),
     currentRow: 0,
@@ -44,10 +48,10 @@ export default function Game() {
         const todayKey = getTodayKey();
         const completedDaily = localStorage.getItem(`completed_daily_${todayKey}`);
         
-        // If we've completed today's word or explicitly in random mode, fetch random word
-        const endpoint = (completedDaily === 'true' || isRandomMode) ? '/api/word' : '/api/word/daily';
+        // If we've completed today's word or explicitly in random mode, use practice mode
+        const mode = (completedDaily === 'true' || isRandomMode) ? 'practice' : 'daily';
         
-        const response = await fetch(endpoint);
+        const response = await fetch(`/api/word?mode=${mode}`);
         if (!response.ok) {
           throw new Error('Failed to fetch word');
         }
@@ -180,6 +184,12 @@ export default function Game() {
       targetLetterCount[letter] = (targetLetterCount[letter] || 0) + 1;
     }
 
+    // Count guess word letter frequencies
+    const guessLetterCount: {[key: string]: number} = {};
+    for (const letter of word) {
+      guessLetterCount[letter] = (guessLetterCount[letter] || 0) + 1;
+    }
+
     // Initialize all positions as absent
     const letterResults = Array(WORD_LENGTH).fill(LetterState.Absent);
     
@@ -190,6 +200,7 @@ export default function Game() {
       if (letter === targetWord[i]) {
         letterResults[i] = LetterState.Correct;
         targetLetterCount[letter]--;
+        guessLetterCount[letter]--;
       }
     }
 
@@ -201,6 +212,7 @@ export default function Game() {
       if (targetWord.includes(letter) && targetLetterCount[letter] > 0) {
         letterResults[i] = LetterState.Present;
         targetLetterCount[letter]--;
+        guessLetterCount[letter]--;
       }
     }
 
@@ -219,7 +231,8 @@ export default function Game() {
       // Update current row's letter states
       currentRowStates[letter] = state;
 
-      // Update keyboard letter states
+      // Update keyboard letter states - for keyboard, we want to show the "best" state
+      // Blue > Correct > Present > Absent
       if (state === LetterState.Blue ||
           (state === LetterState.Correct && !isCorrectWord) ||
           (state === LetterState.Present && newLetterStates[letter] !== LetterState.Correct) ||

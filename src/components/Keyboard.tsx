@@ -117,7 +117,7 @@ const Keyboard = ({ onKeyPress, letterStates }: KeyboardProps) => {
 
   return (
     <div className="w-full bg-zinc-800">
-      <div className="flex flex-col gap-2 max-w-3xl mx-auto">
+      <div className="flex flex-col gap-1.5 max-w-[500px] mx-auto px-1 sm:px-4">
         {KEYBOARD_ROWS.map((row, rowIndex) => (
           <div key={rowIndex} className="flex justify-center gap-1.5">
             {row.map((key) => {
@@ -130,18 +130,25 @@ const Keyboard = ({ onKeyPress, letterStates }: KeyboardProps) => {
               const glowEffect = state
                 ? `inset 0 0 8px ${border}, 0 0 5px ${border}`
                 : `0 0 5px ${keyColor}`;
-
+              
               return (
                 <button
                   key={key}
                   data-key={key}
-                  className={`${bg} px-2 py-4 rounded-lg text-2xl font-bold border-2 ${
-                    isSpecialKey ? 'w-[100px]' : 'w-[50px]'
-                  } h-[65px] transition-all duration-300 hover:opacity-90 ${
-                    animatingKeys.has(key) ? 'state-change' : ''
-                  }`}
+                  className={`
+                    ${bg}
+                    ${isSpecialKey ? 'text-[0.65rem] sm:text-sm px-1 sm:px-2 min-w-[40px] sm:min-w-[65px]' : 'text-sm sm:text-lg px-1 sm:px-3 min-w-[25px] sm:min-w-[43px]'}
+                    h-[40px] sm:h-[58px]
+                    rounded-lg
+                    font-bold
+                    border-2
+                    transition-all
+                    duration-300
+                    hover:opacity-90
+                    ${animatingKeys.has(key) ? 'state-change' : ''}
+                  `}
                   onClick={() => handleKeyPress(key)}
-                  style={{ 
+                  style={{
                     fontFamily: "'SuperMario256', sans-serif",
                     borderColor: borderColor,
                     boxShadow: glowEffect,

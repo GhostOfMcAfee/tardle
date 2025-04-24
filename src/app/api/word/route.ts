@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
-import { VALID_WORDS } from '@/lib/words';
+import { getDailyWord, getRandomWord } from '@/lib/dailyWord';
 
-export async function GET() {
-  try {
-    // Select a random word
-    const randomIndex = Math.floor(Math.random() * VALID_WORDS.length);
-    const word = VALID_WORDS[randomIndex];
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const mode = searchParams.get('mode');
 
-    return NextResponse.json({ word });
-  } catch (error) {
-    console.error('Error selecting word:', error);
-    return NextResponse.json({ error: 'Failed to get word' }, { status: 500 });
-  }
+  // Get word based on mode
+  const word = mode === 'practice' ? getRandomWord() : getDailyWord();
+
+  return NextResponse.json({ word });
 } 

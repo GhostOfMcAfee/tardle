@@ -41,7 +41,7 @@ const generateTwitterText = (guesses: string[][], letterStates: Record<string, L
     .filter(Boolean)
     .join('\n');
 
-  return `TARDLE of the Day\n${emojiGrid}`;
+  return `TARDLE of the Day\n${emojiGrid}\n\nPlay at tardle.netlify.app`;
 };
 
 const shareToTwitter = (guesses: string[][], letterStates: Record<string, LetterState>[]) => {
