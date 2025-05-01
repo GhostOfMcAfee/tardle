@@ -25,13 +25,13 @@ const generateTwitterText = (guesses: string[][], letterStates: Record<string, L
           const state = letterStates[rowIndex][letter.toLowerCase()];
           switch (state) {
             case LetterState.Blue:
-              return '🤑';
+              return '🟦';
             case LetterState.Correct:
-              return '🌈';
+              return '🟩';
             case LetterState.Present:
-              return '🫵';
+              return '🟨';
             case LetterState.Absent:
-              return '🤡';
+              return '🟥';
             default:
               return '';
           }

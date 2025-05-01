@@ -5,14 +5,18 @@ function getDailyIndex(date: Date): number {
   // Get days since epoch (January 1, 1970)
   const daysSinceEpoch = Math.floor(date.getTime() / (1000 * 60 * 60 * 24));
   
-  // Use a simple but effective seeded random number generator
+  // Use a more sophisticated seeded random number generator
   // This ensures the same word is chosen for everyone on the same day
-  // but makes the sequence appear more random
+  // but provides better distribution of words
   let seed = daysSinceEpoch;
-  seed = (seed * 9301 + 49297) % 233280;
-  const rnd = seed / 233280;
   
-  return Math.floor(rnd * VALID_WORDS.length);
+  // Multiply by a large prime number and add another prime
+  seed = (seed * 16807) % 2147483647;
+  seed = (seed * 16807) % 2147483647;
+  seed = (seed * 16807) % 2147483647;
+  
+  // Map to the range of valid words
+  return Math.floor((seed / 2147483647) * VALID_WORDS.length);
 }
 
 // Get today's word

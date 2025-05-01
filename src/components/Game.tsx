@@ -204,10 +204,10 @@ export default function Game({ initialRandomMode }: GameProps) {
       guessLetterCount[letter] = (guessLetterCount[letter] || 0) + 1;
     }
 
-    // Initialize all positions as absent
+    // Initialize all positions as absent (red)
     const letterResults = Array(WORD_LENGTH).fill(LetterState.Absent);
     
-    // First pass: Mark only exact matches
+    // First pass: Mark exact matches (green)
     const isCorrectWord = word === targetWord;
     for (let i = 0; i < WORD_LENGTH; i++) {
       const letter = word[i];
@@ -218,7 +218,7 @@ export default function Game({ initialRandomMode }: GameProps) {
       }
     }
 
-    // Second pass: Mark yellow letters
+    // Second pass: Mark present letters (yellow)
     for (let i = 0; i < WORD_LENGTH; i++) {
       const letter = word[i];
       if (letterResults[i] === LetterState.Correct) continue;
